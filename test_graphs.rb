@@ -58,9 +58,10 @@ class TestGraphs < Test::Unit::TestCase
   def test_graph_builds
     graph = GraphConfig.build(:dag_has_cycle_true)
     assert_not_nil(graph)
+    # add validation tests between proxy values and graph values
     
     graphs = GraphConfig.build_all()
-    assert_not_empty(graphs)
+    assert_equal(graphs.size, GraphConfig.registry.size)
   end
 
   def test_attribute_whitelist

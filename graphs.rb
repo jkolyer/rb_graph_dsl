@@ -16,6 +16,10 @@ class Graph
     self.directed = true
   end
 
+  def to_s
+    "#{self.class.name}(#{id}): #{node_count} nodes"
+  end
+
   def run_algorithm
     raise ArgumentError.new("Found nil argument #{self.class.config_attrs}") \
       if self.class.config_attrs.map{|at| send(at)}.any?(nil)
