@@ -1,17 +1,20 @@
+require 'logger'
 class AlgorithmResultError < StandardError; end
 
 class Graph
-  @config_attrs = [:id, :node_count, :edges, :directed, :algorithm, :expected_value].freeze
-  @no_expected_value = Object.new
-  
+  @config_attrs = [:id, :node_count, :edges, :directed, :algorithm, :expected_result].freeze
+  @no_expected_result = Object.new
+
   def self.config_attrs
     @config_attrs
   end
   attr_accessor(*self.config_attrs)
 
+  @@logger = Logger.new(STDOUT)
+
   def initialize
     # this value is not required
-    self.expected_value = @no_expected_value
+    self.expected_result = @no_expected_result
     # we default to directed graph
     self.directed = true
   end
@@ -24,14 +27,20 @@ class Graph
     raise ArgumentError.new("Found nil argument #{self.class.config_attrs}") \
       if self.class.config_attrs.map{|at| send(at)}.any?(nil)
 
+    @@logger.info { "start #{id}" }
     result = send(algorithm)
+    @@logger.info { "finish #{id}:  result = #{result}" }
     
-    if _has_expected_value? && result != expected_value
-      raise AlgorithmResultError.new("#{algorithm} expecting #{expected_value}; instead got #{result}")
+    if _has_expected_result? && result != expected_result
+      raise AlgorithmResultError.new("#{algorithm} expecting #{expected_result}; instead got #{result}")
     end
     result
   end
 
+  ############
+  # Algorithms
+  ############
+  
   def has_cycle?
     directed ? _directed_has_cycle? : _undirected_has_cycle?
   end
@@ -66,8 +75,8 @@ class Graph
     Array.new(node_count, false)
   end
 
-  def _has_expected_value?
-    self.expected_value != @no_expected_value
+  def _has_expected_result?
+    self.expected_result != @no_expected_result
   end
 
   def _adj_list
