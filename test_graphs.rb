@@ -4,7 +4,18 @@ require "test/unit"
  
 class TestGraphs < Test::Unit::TestCase
 
+  @@did_setup = false
+
   def setup
+    super
+    return if @@did_setup
+    
+    @@did_setup = true
+    
+    GraphConfig::GraphSettings.configure do
+      track_performance true
+    end
+    
     GraphConfig.configure do
       config Graph do
         id :dag_has_cycle_true
@@ -47,6 +58,12 @@ class TestGraphs < Test::Unit::TestCase
         expected_result [1, 6, 3, 0, 5, 2, 4]
       end
     end
+  end
+
+  def test_settings
+    values = GraphConfig::GraphSettings.settings_values
+    track_performance = values[:track_performance]
+    assert_equal(track_performance, true)
   end
 
   # tests

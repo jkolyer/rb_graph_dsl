@@ -39,7 +39,6 @@ module GraphConfig
   end
 
   class GraphProxy
-    
     class Proxy < OpenStruct
       @@private_attrs = [:config_attrs, :graph_class]
       
@@ -71,7 +70,6 @@ module GraphConfig
         attrs.delete_if { |key,val| config_attrs.index(key).nil? }
         return attrs
       end
-      
     end
     
     def config(graph_class, &block)
@@ -83,6 +81,37 @@ module GraphConfig
       proxy[:graph_class] = graph_class
       
       GraphConfig.registry[proxy.id] = proxy
+    end
+  end
+  
+  module GraphSettings
+    @settings_attrs = [:track_performance]
+    
+    def self.settings_attrs
+      @settings_attrs
+    end
+
+    class SettingsProxy < OpenStruct
+      def method_missing(attr, *args, &block)
+        # first check white list and ignore invalid properties
+        GraphConfig.raise_invalid_attr(attr) if GraphSettings.settings_attrs.index(attr).nil?
+        # saves attr and value locally
+        self[attr] = args.size > 0 ? args[0] : block
+      end
+    end
+    
+    @settings = SettingsProxy.new
+
+    def self.settings_values
+      @settings
+    end
+
+    def self.configure(&block)
+      @settings.instance_eval(&block)
+    end
+
+    def self.track_performance
+      @settings[:track_performance]
     end
   end
 end

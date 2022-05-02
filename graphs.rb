@@ -27,9 +27,9 @@ class Graph
     raise ArgumentError.new("Found nil argument #{self.class.config_attrs}") \
       if self.class.config_attrs.map{|at| send(at)}.any?(nil)
 
-    @@logger.info { "start #{id}" }
+    log_perf { "start #{id}" } 
     result = send(algorithm)
-    @@logger.info { "finish #{id}:  result = #{result}" }
+    log_perf { "finish #{id}:  result = #{result}" } 
     
     if _has_expected_result? && result != expected_result
       raise AlgorithmResultError.new("#{algorithm} expecting #{expected_result}; instead got #{result}")
@@ -46,30 +46,17 @@ class Graph
   end
 
   def topological_sort
-    @visited = _init_node_count_false_array
-    @topo_stack = []
-
-    def _dfs_topo_sort(vtx)
-      @visited[vtx] = true
-      return @topo_stack << vtx if _adj_list[vtx].empty?
-
-      _adj_list[vtx].each do |adj_vtx|
-        next if @visited[adj_vtx]
-        _dfs_topo_sort(adj_vtx)
-      end
-      @topo_stack << vtx
-    end
-    
-    (0...node_count).each do |vtx|
-      next if @visited[vtx]
-      _dfs_topo_sort(vtx) 
-    end
-    @topo_stack.reverse    
+    raise ArgumentError.new() unless directed
+    _topological_sort
   end
 
   #########
   protected
   #########
+
+  def log_perf(&block)
+    @@logger.info(&block) if GraphConfig::GraphSettings.track_performance
+  end
 
   def _init_node_count_false_array
     Array.new(node_count, false)
@@ -145,6 +132,28 @@ class Graph
     
     _dfs_cycle(0)
     @has_cycle
+  end
+
+  def _topological_sort
+    @visited = _init_node_count_false_array
+    @topo_stack = []
+
+    def _dfs_topo_sort(vtx)
+      @visited[vtx] = true
+      return @topo_stack << vtx if _adj_list[vtx].empty?
+
+      _adj_list[vtx].each do |adj_vtx|
+        next if @visited[adj_vtx]
+        _dfs_topo_sort(adj_vtx)
+      end
+      @topo_stack << vtx
+    end
+    
+    (0...node_count).each do |vtx|
+      next if @visited[vtx]
+      _dfs_topo_sort(vtx) 
+    end
+    @topo_stack.reverse    
   end
 
 end
