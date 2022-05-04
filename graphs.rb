@@ -13,7 +13,7 @@ class Graph
   @@logger = Logger.new(STDOUT)
 
   def initialize
-    # this value is not required
+    # this expected_result is not required, so we use default instead of nil
     self.expected_result = @no_expected_result
     # we default to directed graph
     self.directed = true
