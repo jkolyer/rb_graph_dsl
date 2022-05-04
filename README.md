@@ -2,7 +2,7 @@
 
 This repo serves as an example for DSL design in Ruby, and a testbed for graph algorithm development. 
 
-##DSL 
+## DSL 
 The approach used here creates a configuration proxy for individual graph algorthims; in addition top-level settings such as logging are configured for all individual graphs.  
 
 The graph properties being configured include 
