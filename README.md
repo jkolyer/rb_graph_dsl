@@ -16,7 +16,7 @@ The graph properties being configured include
 
 We create a proxy object which contains a graph's properties and store that for lookup by identifier when the graph's algorithm is executed.  
 
-The configuration properties are not hard-coded into the DSL.  Instead the graph class is expected to provide a method [**config_attrs**](https://github.com/jkolyer/rb_graph_dsl/blob/master/graphs.rb#L8) as a white list of allowed properties.  This approach allows decoupling between the DSL and the user-defined base graph class.
+The configuration properties are not hard-coded into the DSL.  Instead the graph class is expected to provide a static method [**config_attrs**](https://github.com/jkolyer/rb_graph_dsl/blob/master/graphs.rb#L8) as a white list of allowed properties.  This approach allows decoupling between the DSL and the user-defined base graph class.
 
 The proxy object subclasses [_OpenStruct_](https://ruby-doc.org/stdlib-3.1.2/libdoc/ostruct/rdoc/OpenStruct.html) and overrides **[method_missing](https://ruby-doc.org/core-2.6.3/BasicObject.html#method-i-method_missing)**.  This provides us with a "blank slate" style object and, using an attribute whitelist, a safe implementation of **method_missing** – note that relying on this technique can be tricky, but our approach simplifies it.
 
